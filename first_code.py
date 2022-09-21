@@ -98,10 +98,39 @@ na있는 컬럼들
 """
 
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+import seaborn as sns
 
 #loan_limit : 승인한도
-loan_limit_na = merge_df[merge_df["loan_limit"].isna()]
-plt.hist(merge_df["loan_limit"], bins=10)
+from sklearn.preprocessing import MinMaxScaler
 
-sns.distplot(merge_df["loan_limit"], rug=True)
-plt.show()
+scaler = MinMaxScaler()
+df_minmax = scaler.fit_transform(merge_df)
+
+#5625
+merge_df["loan_limit"].isna().sum()
+merge_df["loan_rate"].isna().sum()
+
+#91626
+merge_df["birth_year"].isna().sum()
+merge_df["gender"].isna().sum()
+
+#1243812
+merge_df["credit_score"].isna().sum()
+
+#303568
+merge_df["company_enter_month"].isna().sum()
+
+#5873229
+merge_df["personal_rehabilitation_yn"].isna().sum()
+#9232232
+merge_df["personal_rehabilitation_complete_yn"].isna().sum()
+
+
+#loan_rate, loan_limit 제거 (평가x)
+merge_df["loan_limit"] =  merge_df["loan_limit"].dropna()
+merge_df["loan_rate"] =  merge_df["loan_rate"].dropna()
+
+
+
+
