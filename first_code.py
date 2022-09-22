@@ -152,28 +152,33 @@ merge_df["existing_loan_cnt"].fillna(0, inplace=True)
 merge_df["existing_loan_amt"].fillna(0, inplace=True)
 
 
+import swifter
 
 #신용점수 등급으로 변경
-for i in range(len(merge_df)):
-    if merge_df["credit_score"].iloc[i] >=942:
-        merge_df["credit_score"].iloc[i] = 1
-    elif merge_df["credit_score"].iloc[i]  >= 891 and merge_df["credit_score"].iloc[i] <942:
-        merge_df["credit_score"].iloc[i] = 2
-    elif merge_df["credit_score"].iloc[i]  >= 832 and merge_df["credit_score"].iloc[i] <891:
-        merge_df["credit_score"].iloc[i] = 3
-    elif merge_df["credit_score"].iloc[i]  >= 768 and merge_df["credit_score"].iloc[i] <832:
-        merge_df["credit_score"].iloc[i] = 4
-    elif merge_df["credit_score"].iloc[i]  >= 698 and merge_df["credit_score"].iloc[i] <768:
-        merge_df["credit_score"].iloc[i] = 5
-    elif merge_df["credit_score"].iloc[i]  >= 630 and merge_df["credit_score"].iloc[i] <698:
-        merge_df["credit_score"].iloc[i] = 6
-    elif merge_df["credit_score"].iloc[i]  >= 530 and merge_df["credit_score"].iloc[i] <630:
-        merge_df["credit_score"].iloc[i] = 7
-    elif merge_df["credit_score"].iloc[i]  >= 454 and merge_df["credit_score"].iloc[i] <530:
-        merge_df["credit_score"].iloc[i] = 8
-    elif merge_df["credit_score"].iloc[i]  >= 335 and merge_df["credit_score"].iloc[i] <454:
-        merge_df["credit_score"].iloc[i] = 9
-    elif merge_df["credit_score"].iloc[i] <334:
-        merge_df["credit_score"].iloc[i] = 10
-    
+def change_credit_rate(x):
+        if x >=942:
+            return 1
+        elif x  >= 891 and x <942:
+            return 2
+        elif x  >= 832 and x <891:
+            return 3
+        elif x  >= 768 and x <832:
+            return 4
+        elif x  >= 698 and x <768:
+            return 5
+        elif x  >= 630 and x <698:
+            return 6
+        elif x  >= 530 and x <630:
+            return 7
+        elif x  >= 454 and x <530:
+            return 8
+        elif x  >= 335 and x <454:
+            return 9
+        elif x <334 and x>0 :
+            return 10
+ 
 
+merge_df["credit_score"] = merge_df["credit_score"].swifter.apply(change_credit_rate)
+
+
+merge_df_head = merge_df.head(5000)
