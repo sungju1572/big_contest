@@ -1,5 +1,9 @@
 import pandas as pd
 
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
+import seaborn as sns
+
 
 loan_result = pd.read_csv("loan_result.csv")
 log_data = pd.read_csv("log_data.csv")
@@ -97,15 +101,8 @@ na있는 컬럼들
  'existing_loan_amt']
 """
 
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-import seaborn as sns
 
 #loan_limit : 승인한도
-from sklearn.preprocessing import MinMaxScaler
-
-scaler = MinMaxScaler()
-df_minmax = scaler.fit_transform(merge_df)
 
 #5625
 merge_df["loan_limit"].isna().sum()
@@ -127,10 +124,56 @@ merge_df["personal_rehabilitation_yn"].isna().sum()
 merge_df["personal_rehabilitation_complete_yn"].isna().sum()
 
 
+merge_df["existing_loan_cnt"].isna().sum()
+merge_df["existing_loan_amt"].isna().sum()
+
+len(merge_df)
+
+
+merge_df = merge_df[merge_df["loan_limit"].notna()]
+
 #loan_rate, loan_limit 제거 (평가x)
-merge_df["loan_limit"] =  merge_df["loan_limit"].dropna()
-merge_df["loan_rate"] =  merge_df["loan_rate"].dropna()
+merge_df = merge_df[merge_df["loan_limit"].notna()]
+merge_df = merge_df[merge_df["loan_rate"].notna()]
+
+#birth_year, gender 제거 
+merge_df = merge_df[merge_df["birth_year"].notna()]
+merge_df = merge_df[merge_df["gender"].notna()]
+
+#company_enter_month 제거
+merge_df = merge_df[merge_df["company_enter_month"].notna()]
+
+#'personal_rehabilitation_yn', : 개인회생자 여부 ,'personal_rehabilitation_complete_yn', : 개인회생자 납입완료 여부 / 0으로 변환
+#'existing_loan_cnt', : 기대출수 , 'existing_loan_amt' : 기대출금액 / 0으로 변환
+
+merge_df["personal_rehabilitation_yn"].fillna(0, inplace=True)
+merge_df["personal_rehabilitation_complete_yn"].fillna(0, inplace=True)
+merge_df["existing_loan_cnt"].fillna(0, inplace=True)
+merge_df["existing_loan_amt"].fillna(0, inplace=True)
 
 
 
+#신용점수 등급으로 변경
+for i in range(len(merge_df)):
+    if merge_df["credit_score"].iloc[i] >=942:
+        merge_df["credit_score"].iloc[i] = 1
+    elif merge_df["credit_score"].iloc[i]  >= 891 and merge_df["credit_score"].iloc[i] <942:
+        merge_df["credit_score"].iloc[i] = 2
+    elif merge_df["credit_score"].iloc[i]  >= 832 and merge_df["credit_score"].iloc[i] <891:
+        merge_df["credit_score"].iloc[i] = 3
+    elif merge_df["credit_score"].iloc[i]  >= 768 and merge_df["credit_score"].iloc[i] <832:
+        merge_df["credit_score"].iloc[i] = 4
+    elif merge_df["credit_score"].iloc[i]  >= 698 and merge_df["credit_score"].iloc[i] <768:
+        merge_df["credit_score"].iloc[i] = 5
+    elif merge_df["credit_score"].iloc[i]  >= 630 and merge_df["credit_score"].iloc[i] <698:
+        merge_df["credit_score"].iloc[i] = 6
+    elif merge_df["credit_score"].iloc[i]  >= 530 and merge_df["credit_score"].iloc[i] <630:
+        merge_df["credit_score"].iloc[i] = 7
+    elif merge_df["credit_score"].iloc[i]  >= 454 and merge_df["credit_score"].iloc[i] <530:
+        merge_df["credit_score"].iloc[i] = 8
+    elif merge_df["credit_score"].iloc[i]  >= 335 and merge_df["credit_score"].iloc[i] <454:
+        merge_df["credit_score"].iloc[i] = 9
+    elif merge_df["credit_score"].iloc[i] <334:
+        merge_df["credit_score"].iloc[i] = 10
+    
 
