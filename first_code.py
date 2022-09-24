@@ -87,6 +87,7 @@ na_columns_list = []
 for i in range(len(merge_df.columns)):
     if merge_df.iloc[:,i].isna().sum() != 0 :
         na_columns_list.append(merge_df.columns[i])
+        
 """
 na있는 컬럼들
 ['loan_limit',
