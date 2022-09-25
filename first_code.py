@@ -1,5 +1,9 @@
 import pandas as pd
 
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
+import seaborn as sns
+
 
 loan_result = pd.read_csv("loan_result.csv")
 log_data = pd.read_csv("log_data.csv")
@@ -83,6 +87,7 @@ na_columns_list = []
 for i in range(len(merge_df.columns)):
     if merge_df.iloc[:,i].isna().sum() != 0 :
         na_columns_list.append(merge_df.columns[i])
+        
 """
 na있는 컬럼들
 ['loan_limit',
@@ -97,15 +102,8 @@ na있는 컬럼들
  'existing_loan_amt']
 """
 
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-import seaborn as sns
 
 #loan_limit : 승인한도
-from sklearn.preprocessing import MinMaxScaler
-
-scaler = MinMaxScaler()
-df_minmax = scaler.fit_transform(merge_df)
 
 #5625
 merge_df["loan_limit"].isna().sum()
@@ -127,10 +125,61 @@ merge_df["personal_rehabilitation_yn"].isna().sum()
 merge_df["personal_rehabilitation_complete_yn"].isna().sum()
 
 
+merge_df["existing_loan_cnt"].isna().sum()
+merge_df["existing_loan_amt"].isna().sum()
+
+len(merge_df)
+
+
+merge_df = merge_df[merge_df["loan_limit"].notna()]
+
 #loan_rate, loan_limit 제거 (평가x)
-merge_df["loan_limit"] =  merge_df["loan_limit"].dropna()
-merge_df["loan_rate"] =  merge_df["loan_rate"].dropna()
+merge_df = merge_df[merge_df["loan_limit"].notna()]
+merge_df = merge_df[merge_df["loan_rate"].notna()]
+
+#birth_year, gender 제거 
+merge_df = merge_df[merge_df["birth_year"].notna()]
+merge_df = merge_df[merge_df["gender"].notna()]
+
+#company_enter_month 제거
+merge_df = merge_df[merge_df["company_enter_month"].notna()]
+
+#'personal_rehabilitation_yn', : 개인회생자 여부 ,'personal_rehabilitation_complete_yn', : 개인회생자 납입완료 여부 / 0으로 변환
+#'existing_loan_cnt', : 기대출수 , 'existing_loan_amt' : 기대출금액 / 0으로 변환
+
+merge_df["personal_rehabilitation_yn"].fillna(0, inplace=True)
+merge_df["personal_rehabilitation_complete_yn"].fillna(0, inplace=True)
+merge_df["existing_loan_cnt"].fillna(0, inplace=True)
+merge_df["existing_loan_amt"].fillna(0, inplace=True)
 
 
+import swifter
+
+#신용점수 등급으로 변경
+def change_credit_rate(x):
+        if x >=942:
+            return 1
+        elif x  >= 891 and x <942:
+            return 2
+        elif x  >= 832 and x <891:
+            return 3
+        elif x  >= 768 and x <832:
+            return 4
+        elif x  >= 698 and x <768:
+            return 5
+        elif x  >= 630 and x <698:
+            return 6
+        elif x  >= 530 and x <630:
+            return 7
+        elif x  >= 454 and x <530:
+            return 8
+        elif x  >= 335 and x <454:
+            return 9
+        elif x <334 and x>0 :
+            return 10
+ 
+
+merge_df["credit_score"] = merge_df["credit_score"].swifter.apply(change_credit_rate)
 
 
+merge_df_head = merge_df.head(5000)
